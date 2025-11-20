@@ -1,4 +1,4 @@
-// Klass som *lägger till* och *tar bort* DOM-element dynamiskt.
+ // Klass som *lägger till* och *tar bort* DOM-element dynamiskt.
 export class Mole {
     constructor(cellEl, ttl = 900) {
         this.cellEl = cellEl;
@@ -29,4 +29,4 @@ export class Mole {
     isVisible() {
         return this.cellEl.classList.contains('has-mole');
     }
-}
+ }

@@ -64,6 +64,14 @@ export class Game {
     handleBoardClick(e) {
         const cell = e.target.closest('.cell');
         if (!cell || !this.state.running) return;
+        if (cell.className.includes("has-mole")) {
+            this.state.score += 1
+            console.log(this.state.score);
+         } else {
+            this.state.misses += 1
+            console.log(this.state.misses)
+         }
+        
         // TODO: om cellen innehåller en aktiv mullvad => poäng; annars öka missar
         // Uppdatera HUD varje gång.
     }
