@@ -13,3 +13,5 @@ const game = new Game(ui);
 game.init(); // Skapar bräde, binder events
 ui.startBtn.addEventListener('click', () => game.start());
 ui.resetBtn.addEventListener('click', () => game.reset());
+
+console.log(game)

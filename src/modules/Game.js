@@ -17,6 +17,7 @@ export class Game {
         this._spawnId = null;
         this._activeMoles = new Set();
         this.handleBoardClick = this.handleBoardClick.bind(this);
+        this.spawnMole = this.spawnMole.bind(this)
     }
     init() {
         this.createGrid(this.gridSize);
@@ -47,7 +48,10 @@ export class Game {
 
         // TODO: implementera spelloop
         // 1) setInterval: nedräkning av timeLeft
+        
+        
         // 2) setInterval eller rekursiva setTimeout: spawn av mullvadar (variera TTL/frekvens över tid)
+        setTimeout(this.spawnMole, 1000)
     }
     reset() {
         // TODO: städa timers, ta bort aktiva mullvadar, nollställ state och UI
@@ -55,24 +59,25 @@ export class Game {
     }
     spawnMole() {
         // TODO: välj slumpmässig tom cell och mounta en ny Mole
-        // const emptyCells = [...this.boardEl.querySelectorAll('.cell:not(.has-mole)')];
-        // const cell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-        // const mole = new Mole(cell, /* ttl i ms */);
-        // this._activeMoles.add(mole);
-        // mole.appear(() => { this._activeMoles.delete(mole); /* miss om utgång utan träff? */ });
+        const emptyCells = [...document.querySelectorAll('.cell:not(.has-mole)')];
+        const cell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+        const mole = new Mole(cell /* ttl i ms */);
+        this._activeMoles.add(mole);
+        mole.appear(() => { this._activeMoles.delete(mole); /* miss om utgång utan träff? */ });
+        setTimeout(this.spawnMole, 1500);
     }
     handleBoardClick(e) {
         const cell = e.target.closest('.cell');
         if (!cell || !this.state.running) return;
+        // TODO: om cellen innehåller en aktiv mullvad => poäng; annars öka missar
         if (cell.className.includes("has-mole")) {
             this.state.score += 1
             console.log(this.state.score);
-         } else {
+        } else {
             this.state.misses += 1
             console.log(this.state.misses)
-         }
+        }
         
-        // TODO: om cellen innehåller en aktiv mullvad => poäng; annars öka missar
         // Uppdatera HUD varje gång.
     }
     updateHud() {
