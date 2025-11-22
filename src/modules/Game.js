@@ -11,13 +11,9 @@ export class Game {
         this.timeEl = timeEl;
         this.missesEl = missesEl;
         this.gridSize = 3;
-        this.duration = 60; // sekunder
-        this.state = { score: 0, misses: 0, timeLeft: this.duration, running: false };
-        this._tickId = null;
-        this._spawnId = null;
-        this._activeMoles = new Set();
         this.handleBoardClick = this.handleBoardClick.bind(this);
         this.spawnMole = this.spawnMole.bind(this)
+        this._initState()
     }
     init() {
         this.createGrid(this.gridSize);
@@ -38,6 +34,13 @@ export class Game {
             this.boardEl.appendChild(cell);
         }
     }
+    _initState() {
+        this.duration = 60; // sekunder
+        this.state = { score: 0, misses: 0, timeLeft: this.duration, running: false };
+        this._tickId = null;
+        this._spawnId = null;
+        this._activeMoles = new Set();
+    }
     start() {
         if (this.state.running) return;
         this.state.running = true;
@@ -48,22 +51,40 @@ export class Game {
 
         // TODO: implementera spelloop
         // 1) setInterval: nedräkning av timeLeft
-        
+        this._tickId = setInterval(() => {
+            this.state.timeLeft -= 1
+            this.updateHud()
+            if (this.state.timeLeft === 0) return this.gameOver()
+        }, 1000)
         
         // 2) setInterval eller rekursiva setTimeout: spawn av mullvadar (variera TTL/frekvens över tid)
         setTimeout(this.spawnMole, 1000)
     }
+    gameOver() {
+        clearInterval(this._tickId)
+        this.state.running = false
+    }
     reset() {
         // TODO: städa timers, ta bort aktiva mullvadar, nollställ state och UI
+        clearInterval(this._tickId)
         // Tips: loopa this._activeMoles och kalla .disappear()
+        for (const mole of this._activeMoles) mole.disappear()
+        this._activeMoles.clear()
+        this._initState()
+        this.updateHud()
     }
     spawnMole() {
         // TODO: välj slumpmässig tom cell och mounta en ny Mole
+        if (!this.state.running) return
         const emptyCells = [...document.querySelectorAll('.cell:not(.has-mole)')];
         const cell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
         const mole = new Mole(cell /* ttl i ms */);
         this._activeMoles.add(mole);
-        mole.appear(() => { this._activeMoles.delete(mole); /* miss om utgång utan träff? */ });
+        mole.appear(() => { 
+            this._activeMoles.delete(mole); 
+            this.state.misses += 1 /* miss om utgång utan träff */ 
+            this.updateHud
+        });
         setTimeout(this.spawnMole, 1500);
     }
     handleBoardClick(e) {
@@ -72,10 +93,10 @@ export class Game {
         // TODO: om cellen innehåller en aktiv mullvad => poäng; annars öka missar
         if (cell.className.includes("has-mole")) {
             this.state.score += 1
-            console.log(this.state.score);
+            this.updateHud()
         } else {
             this.state.misses += 1
-            console.log(this.state.misses)
+            this.updateHud()
         }
         
         // Uppdatera HUD varje gång.
