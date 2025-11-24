@@ -19,7 +19,7 @@ export class Game {
         this.createGrid(this.gridSize);
         this.updateHud();
         // Eventdelegering: en lyssnare hanterar alla barn-noder.
-        this.boardEl.addEventListener('click', this.handleBoardClick);
+        this.boardEl.addEventListener('mousedown', this.handleBoardClick);
         this.boardEl.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') this.handleBoardClick(e);
         });

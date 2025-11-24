@@ -34,11 +34,15 @@ body {
     padding: var(--gap);
 }
 .cell {
+    /* position: relative; */
     flex: 1 0 calc(33.333% - var(--gap));
     aspect-ratio: 1 / 1;
-    display: grid; place-items: center;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    place-items: center;
     background: #f2f2f2; border: 2px solid #bbb; border-radius: 10px;
-    cursor: "X";
+    cursor: crosshair;
 }
 .cell:focus { 
     outline: 3px solid #0a7; 
@@ -46,13 +50,41 @@ body {
 }
 /* Temporär visuell mullvad , byt gärna mot egen grafik. */
 .cell .mole {
-    width: 65%; 
-    height: 65%; 
+    grid-area: 1 / 1;
+    width: 40%; 
+    height: 50%; 
     border-radius: 50%;
     background: radial-gradient(circle at 50% 60%, #5b3b1a, #2d1a0a 60%, #000 100%);
-    transition: all 30ms ease-out;
+    translate: 0 30%;
+    /* transition: all 30ms linear; */
 }
 .cell .mole.whacked {
     scale: 1 .2; 
-    translate: 0 50%;
+    translate: 0 70%;
+}
+.cell::before {
+    grid-area: 1 / 1;
+    content: "";
+    background-image: url(./mallet.svg);
+    background-repeat: no-repeat;
+    translate: -10% -20%;
+    width: 90%;
+    height: 90%;
+    opacity: 0;
+    z-index: 1;
+    transition: all 50ms linear;
+}
+.cell:hover::before {
+    opacity: 1;
+}
+.cell:active::before {
+    opacity: 1;
+    rotate: 65deg;
+    translate: -15% 30%;
+    transition: none;
+}
+.cell:visited::before {
+    opacity: 1;
+    rotate: 65deg;
+    translate: -15% 30%;
 }
