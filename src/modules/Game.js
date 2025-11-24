@@ -24,6 +24,13 @@ export class Game {
             if (e.key === 'Enter' || e.key === ' ') this.handleBoardClick(e);
         });
     }
+    _initState() {
+        this.duration = 60; // sekunder
+        this.state = { score: 0, misses: 0, timeLeft: this.duration, running: false };
+        this._tickId = null;
+        this._spawnId = null;
+        this._activeMoles = new Set();
+    }
     createGrid(size = 3) {
         this.boardEl.innerHTML = '';
         for (let i = 0; i < size * size; i++) {
@@ -33,13 +40,6 @@ export class Game {
             cell.setAttribute('aria-label', `Hål ${i + 1}`);
             this.boardEl.appendChild(cell);
         }
-    }
-    _initState() {
-        this.duration = 60; // sekunder
-        this.state = { score: 0, misses: 0, timeLeft: this.duration, running: false };
-        this._tickId = null;
-        this._spawnId = null;
-        this._activeMoles = new Set();
     }
     start() {
         if (this.state.running) return;
@@ -78,14 +78,15 @@ export class Game {
         if (!this.state.running) return
         const emptyCells = [...document.querySelectorAll('.cell:not(.has-mole)')];
         const cell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-        const mole = new Mole(cell /* ttl i ms */);
+        this._spawnId = Date.now()
+        const mole = new Mole(this._spawnId, cell /* ttl i ms */);
         this._activeMoles.add(mole);
         mole.appear(() => { 
+            if (!mole.cellEl.querySelector(".whacked")) this.state.misses += 1 /* miss om utgång utan träff */ 
             this._activeMoles.delete(mole); 
-            this.state.misses += 1 /* miss om utgång utan träff */ 
             this.updateHud
         });
-        setTimeout(this.spawnMole, 1500);
+        setTimeout(this.spawnMole, 800);
     }
     handleBoardClick(e) {
         const cell = e.target.closest('.cell');
@@ -93,7 +94,8 @@ export class Game {
         // TODO: om cellen innehåller en aktiv mullvad => poäng; annars öka missar
         if (cell.className.includes("has-mole")) {
             this.state.score += 1
-            this.updateHud()
+            cell.querySelector(".mole").classList.add("whacked")
+            this.updateHud() 
         } else {
             this.state.misses += 1
             this.updateHud()

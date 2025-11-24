@@ -1,10 +1,12 @@
  // Klass som *lägger till* och *tar bort* DOM-element dynamiskt.
 export class Mole {
-    constructor(cellEl, ttl = 900) {
+    constructor(id, cellEl, ttl = 900) {
+        this.id = id
         this.cellEl = cellEl;
         this.ttl = ttl;
         this._timeout = null;
         this._root = null; // själva mullvadens DOM-nod
+        this.whacked = false
     }
     appear(onExpire) {
         // Skapa en DOM-nod för mullvaden inuti cellen
@@ -14,8 +16,8 @@ export class Mole {
         this.cellEl.classList.add('has-mole');
         // Försvinn efter ttl om ingen träff
         this._timeout = setTimeout(() => {
-            this.disappear();
             if (typeof onExpire === 'function') onExpire();
+            this.disappear();
         }, this.ttl);
     }
     // Anropas vid träff eller timeout
